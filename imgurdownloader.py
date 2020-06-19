@@ -5,7 +5,7 @@ import os
 import urllib.request
 
 urls = ['https://imgur.com/a/cGibB?grid', 'https://imgur.com/a/rBarn?grid']
-baseImgurl = 'https://imgur.com/ajaxalbums/getimages/'
+baseimgurl = 'https://imgur.com/ajaxalbums/getimages/'
 
 
 def getname(url):
@@ -14,18 +14,18 @@ def getname(url):
     return (name)
 
 
-def createDir(foldername):
+def createdir(foldername):
     '''Create folder'''
     os.makedirs(foldername)
 
 
-def getData(url):
+def getdata(url):
     '''Requests img data and build input for download'''
 
     imgurl = []
 
     name = getname(url)
-    datainput = baseImgurl + name + '/hit.json'
+    datainput = baseimgurl + name + '/hit.json'
 
     response = requests.get(datainput).content
     data = json.loads(response)
@@ -34,7 +34,7 @@ def getData(url):
     for d in data:
         imgurl.append(d['hash'] + d['ext'])
     try:
-        createDir(name)
+        createdir(name)
     except Exception:
         pass
 
@@ -52,7 +52,7 @@ def main():
     '''The mainfunction'''
 
     for u in urls:
-        getData(u)
+        getdata(u)
 
 
 if __name__ == "__main__":
