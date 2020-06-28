@@ -1,10 +1,11 @@
-import requests
-from bs4 import BeautifulSoup
-import json
 import os
+import sys
 import urllib.request
+import json
+import requests
 
-urls = ['https://imgur.com/a/cGibB?grid', 'https://imgur.com/a/rBarn?grid']
+# urls = ['https://imgur.com/a/cGibB?grid', 'https://imgur.com/a/rBarn?grid']
+urls = []
 baseimgurl = 'https://imgur.com/ajaxalbums/getimages/'
 
 
@@ -49,11 +50,18 @@ def getdata(url):
 
 
 def main():
-    '''The mainfunction'''
+    '''Main function'''
+    # print(str(sys.argv))
 
-    for u in urls:
-        getdata(u)
+    for item in sys.argv[1:]:
+        if 'imgur.com' in item:
+            getdata(item)
+        else:
+            print('Not a imgur album')
 
+
+#     for u in urls:
+#         getdata(u)
 
 if __name__ == "__main__":
     main()
