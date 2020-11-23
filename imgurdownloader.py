@@ -1,67 +1,61 @@
+import json
 import os
+import pathlib
 import sys
 import urllib.request
-import json
+
 import requests
 
-# urls = ['https://imgur.com/a/cGibB?grid', 'https://imgur.com/a/rBarn?grid']
-urls = []
-baseimgurl = 'https://imgur.com/ajaxalbums/getimages/'
+BASEIMGURL = "https://imgur.com/ajaxalbums/getimages/"
 
 
 def getname(url):
-    '''Takes part of the url and use that as name'''
-    name = url.split('/')[-1].split('?')[0]
-    return (name)
+    """Take part of the url and use that as name."""
+    return pathlib.PosixPath(url).stem
 
 
-def createdir(foldername):
-    '''Create folder'''
-    os.makedirs(foldername)
+def createdir(directory):
+    """Create folder."""
+    os.makedirs(directory)
 
 
 def getdata(url):
-    '''Requests img data and build input for download'''
-
+    """Request img data and build input for download."""
     imgurl = []
 
-    name = getname(url)
-    datainput = baseimgurl + name + '/hit.json'
+    albumname = getname(url)
+    datainput = BASEIMGURL + albumname + "/hit.json"
 
-    response = requests.get(datainput).content
-    data = json.loads(response)
-    data = (data['data']['images'])
+    data = json.loads(requests.get(datainput).content)
+    data = data["data"]["images"]
 
     for d in data:
-        imgurl.append(d['hash'] + d['ext'])
+        imgurl.append(d["hash"] + d["ext"])
     try:
-        createdir(name)
-    except Exception:
-        pass
+        createdir(albumname)
+    except Exception as Error:
+        print(Error)
 
-    for i in imgurl:
+    imgurl = set(imgurl)
+    print("{} img to be downloaded".format(len(imgurl)))
+    for i, item in enumerate(imgurl):
 
-        durl = 'https://i.imgur.com/' + i
-        print('Downloading ' + durl)
+        durl = "https://i.imgur.com/" + item
+        print("Downloading [{}/{}] {}".format(i + 1, len(imgurl), durl))
         opner = urllib.request.build_opener()
-        opner.addheaders = [('User-agent', 'Mozilla/5.0')]
+        opner.addheaders = [("User-agent", "Mozilla/5.0")]
         urllib.request.install_opener(opner)
-        urllib.request.urlretrieve(durl, os.path.join(name, i))
+        urllib.request.urlretrieve(durl, os.path.join(albumname, item))
 
 
 def main():
-    '''Main function'''
-    # print(str(sys.argv))
-
+    """Verify input."""
     for item in sys.argv[1:]:
-        if 'imgur.com' in item:
+        if "imgur.com" in item:
             getdata(item)
         else:
-            print('Not a imgur album')
+            print("Not a imgur album")
 
-
-#     for u in urls:
-#         getdata(u)
 
 if __name__ == "__main__":
     main()
